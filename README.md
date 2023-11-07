@@ -15,19 +15,3 @@ If you already have **VS Code** and **Docker** installed, you can click on the b
 <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/multiversx/mx-sdk-playground/tree/init">
     <img alt="Open in Dev Containers" src="https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode" height="26px" />
 </a>
-
-## For maintainers
-
-Skip this section if you are not a maintainer of the Playground.
-
-Build the Docker image:
-
-```
-docker build --network=host . -t multiversx/development-playground:latest -f ./.devcontainer/Dockerfile
-```
-
-Push the Docker image:
-
-```
-docker push multiversx/development-playground:latest
-```
