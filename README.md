@@ -2,16 +2,19 @@
 
 Playground for contracts and dApps.
 
+## Open in Codespaces
+
+GitHub Codespaces are fully configured development environments in the cloud.
+
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/multiversx/mx-sdk-playground/tree/init?quickstart=1)
 
-[![Open in Dev Containers](https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/multiversx/mx-sdk-playground/tree/init)
+## Open in Visual Studio Code Devcontainers
 
-## Getting started
+If you already have **VS Code** and **Docker** installed, you can click on the badge below to get started. It will cause VS Code to automatically install the Dev Containers extension if needed, clone the source code into a container volume, and spin up a dev container for use.
 
-Once the devcontainer is started (in VSCode or GitHub Codespaces), run `File > Open Workspace from File` and select the file `.devcontainer/default.code-workspace`. The window will reload and you will be ready to go:
-
- - Explorer the `Smart Contracts` folder, follow the `README.md` file, then create, build, test and deploy contracts.
- - Explorer the `Frontend` folder, follow the `README.md` file, then create and start dApps.
+<a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/multiversx/mx-sdk-playground/tree/init">
+    <img alt="Open in Dev Containers" src="https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode" height="26px" />
+</a>
 
 ## For maintainers
 
