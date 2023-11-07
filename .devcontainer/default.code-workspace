@@ -15,6 +15,10 @@
         {
             "name": "Snippets (JavaScript)",
             "path": "../snippets/javascript"
+        },
+        {
+            "name": "Sandbox",
+            "path": "../sandbox"
         }
     ]
 }
