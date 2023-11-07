@@ -1,32 +1,32 @@
 # Frontend
 
+Documentation:
+ - [`sdk-dapp`](https://docs.multiversx.com/sdk-and-tools/sdk-dapp)
+ - [Your first dApp](https://docs.multiversx.com/developers/tutorials/your-first-dapp)
+
 ## Creating dApps
 
-Create a frontend for the contract `Adder` using `mx-template-dapp` as a starting point:
+Create a frontend for the contract(s) using `mx-template-dapp` as a starting point (example):
 
 ```
-git clone --depth=1 --branch=main https://github.com/multiversx/mx-template-dapp.git adder && rm -rf ./adder/.git && rm -rf ./adder/.github
-```
-
-Create frontend for the contract `PingPong` using `mx-template-dapp` as a starting point:
-
-```
-git clone --depth=1 --branch=main https://github.com/multiversx/mx-template-dapp.git ping-pong && rm -rf ./ping-pong/.git && rm -rf ./ping-pong/.github
+new_dapp.sh adder
+new_dapp.sh ping-pong
 ```
 
 ## Building the dApps
 
-```
-cd adder
+Install dependencies using `yarn` (example):
 
-yarn install
 ```
-
+cd $FRONTEND/adder && yarn install
+cd $FRONTEND/ping-pong && yarn install
+```
 
 ## Starting the dApps
 
-```
-cd adder
+Start a dApps by invoking the `start:devnet` script (example):
 
-yarn start:devnet
+```
+cd $FRONTEND/adder && yarn start:devnet
+cd $FRONTEND/ping-pong && yarn start:devnet
 ```

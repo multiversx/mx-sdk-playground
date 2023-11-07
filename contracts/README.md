@@ -5,13 +5,13 @@
 Create a contract using the `Adder` (contract) as a starting point (template):
 
 ```
-mxpy contract new --template=adder adder
+mxpy contract new --template=adder --directory=$CONTRACTS adder
 ```
 
 Create a contract using the `PingPong` (contract) as a starting point (template):
 
 ```
-mxpy contract new --template=ping-pong-egld ping-pong-egld
+mxpy contract new --template=ping-pong-egld --directory=$CONTRACTS ping-pong-egld
 ```
 
 ## Building contracts
@@ -19,17 +19,17 @@ mxpy contract new --template=ping-pong-egld ping-pong-egld
 Build a contract that exists in the folder `adder` (relative path):
 
 ```
-mxpy contract build --path=adder
+mxpy contract build --path=$CONTRACTS/adder
 
-stat adder/output/adder.wasm
+stat $CONTRACTS/adder/output/adder.wasm
 ```
 
 Build a contract that exists in the folder `ping-pong-egld` (relative path):
 
 ```
-mxpy contract build --path=ping-pong-egld
+mxpy contract build --path=$CONTRACTS/ping-pong-egld
 
-stat adder/output/ping-pong-egld.wasm
+stat $CONTRACTS/adder/output/ping-pong-egld.wasm
 ```
 
 ## Running tests
@@ -37,7 +37,7 @@ stat adder/output/ping-pong-egld.wasm
 Run tests for `Adder`:
 
 ```
-cd adder
+cd $CONTRACTS/adder
 
 mxpy contract test
 cargo test
@@ -46,7 +46,7 @@ cargo test
 Run tests for `PingPong`:
 
 ```
-cd ping-pong-egld
+cd $CONTRACTS/ping-pong-egld
 
 mxpy contract test
 cargo test
@@ -60,7 +60,7 @@ Deploy `Adder`:
 
 ```
 mxpy contract deploy --proxy=https://devnet-api.multiversx.com \
-    --bytecode=./adder/output/adder.wasm --gas-limit=15000000 --arguments 0 \
+    --bytecode=$CONTRACTS/adder/output/adder.wasm --gas-limit=15000000 --arguments 0 \
     --pem=$SANDBOX/wallet.pem --recall-nonce \
     --send
 ```
@@ -69,7 +69,7 @@ Deploy `PingPong`:
 
 ```
 mxpy contract deploy --proxy=https://devnet-api.multiversx.com \
-    --bytecode=./ping-pong-egld/output/ping-pong-egld.wasm --gas-limit=25000000 --arguments 1000000000000000000 120 0x00 \
+    --bytecode=$CONTRACTS/ping-pong-egld/output/ping-pong-egld.wasm --gas-limit=25000000 --arguments 1000000000000000000 600 0x00 \
     --pem=$SANDBOX/wallet.pem --recall-nonce \
     --send
 ```
