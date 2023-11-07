@@ -8,9 +8,9 @@ The window will reload and you will be ready to go.
 
 What to do:
 
- - Explore the [**Smart Contracts**](contracts) folder and follow the [`README.md`](contracts/README.md).
- - Explore the [**Sandbox**](sandbox) folder and follow the [`README.md`](sandbox/README.md).
- - Explore the [**Frontend**](frontend) folder and follow the [`README.md`](frontend/README.md).
- - Explore the [**Snippets (Python)**](snippets/python) folder and follow the [`README.md`](snippets/python/README.md).
- - Explore the [**Snippets (JavaScript)**](snippets/javascript) folder and follow the [`README.md`](snippets/python/README.md).
+ - Explore the **Smart Contracts** folder and follow the [`README.md`](contracts/README.md).
+ - Explore the **Sandbox** folder and follow the [`README.md`](sandbox/README.md).
+ - Explore the **Frontend** folder and follow the [`README.md`](frontend/README.md).
+ - Explore the **Snippets (Python)** folder and follow the [`README.md`](snippets/python/README.md).
+ - Explore the **Snippets (JavaScript)** folder and follow the [`README.md`](snippets/python/README.md).
 
