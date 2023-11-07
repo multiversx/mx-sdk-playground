@@ -29,7 +29,11 @@
                         "path": "/usr/bin/bash"
                     }
                 }
-            }
+            },
+            "openFiles": [
+                ".devcontainer/default.code-workspace",
+                "README.md"
+            ]
         }
     }
 }
