@@ -32,7 +32,7 @@ mxpy contract build --path=ping-pong-egld
 stat adder/output/ping-pong-egld.wasm
 ```
 
-## Running contracts tests
+## Running tests
 
 Run tests for `Adder`:
 
@@ -51,3 +51,27 @@ cd ping-pong-egld
 mxpy contract test
 cargo test
 ```
+
+## Deploying contracts
+
+The WASM bytecode files can be found in the `output` subirectory of each contract (upon a successful build).
+
+Deploy `Adder`:
+
+```
+mxpy contract deploy --proxy=https://devnet-api.multiversx.com \
+    --bytecode=./adder/output/adder.wasm --gas-limit=15000000 --arguments 0 \
+    --pem=../sandbox/wallet.pem --recall-nonce \
+    --send
+```
+
+Deploy `PingPong`:
+
+```
+mxpy contract deploy --proxy=https://devnet-api.multiversx.com \
+    --bytecode=./adder/output/adder.wasm --gas-limit=15000000 --arguments 0 \
+    --pem=../sandbox/wallet.pem --recall-nonce \
+    --send
+```
+
+Upon deployment, make sure to retain the addresses of the newly deploy contracts (displayed in `stdout`). Furthermore, inspect the deployment transactions and the contracts on Explorer.
