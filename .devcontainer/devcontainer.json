@@ -4,6 +4,13 @@
         "SANDBOX": "${containerWorkspaceFolder}/sandbox",
         "TESTWALLETS": "/home/developer/multiversx-sdk/testwallets/latest/users"
     },
+    "portsAttributes": {
+        "3000": {
+            "label": "dApp",
+            "onAutoForward": "notify",
+            "protocol": "https"
+        }
+    },
     "customizations": {
         "vscode": {
             "extensions": [

@@ -86,4 +86,5 @@ ARG JS_SDK_NETWORK_PROVIDERS_VERSION="v2.0.0"
 
 RUN npm install -g @multiversx/sdk-core@${JS_SDK_CORE_VERSION} && \
     npm install -g @multiversx/sdk-wallet@${JS_SDK_WALLET_VERSION} && \
-    npm install -g @multiversx/sdk-network-providers@${JS_SDK_NETWORK_PROVIDERS_VERSION}
+    npm install -g @multiversx/sdk-network-providers@${JS_SDK_NETWORK_PROVIDERS_VERSION} \
+    npm install -g yarn
