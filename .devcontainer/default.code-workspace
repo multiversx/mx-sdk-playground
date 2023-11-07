@@ -1,0 +1,20 @@
+{
+    "folders": [
+        {
+            "name": "Smart Contracts",
+            "path": "../contracts"
+        },
+        {
+            "name": "Frontend (dApps)",
+            "path": "../frontend"
+        },
+        {
+            "name": "Snippets (Python)",
+            "path": "../snippets/python"
+        },
+        {
+            "name": "Snippets (JavaScript)",
+            "path": "../snippets/javascript"
+        }
+    ]
+}

@@ -1,0 +1,35 @@
+{
+    "image": "multiversx/development-playground:latest",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "vadimcn.vscode-lldb"
+            ],
+            "settings": {
+                "terminal.integrated.env.linux": {},
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/usr/bin/bash"
+                    }
+                }
+            }
+        },
+        "codespaces": {
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "vadimcn.vscode-lldb"
+            ],
+            "settings": {
+                "terminal.integrated.env.linux": {},
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/usr/bin/bash"
+                    }
+                }
+            }
+        }
+    }
+}
