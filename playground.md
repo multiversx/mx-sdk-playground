@@ -1,7 +1,5 @@
 # Playground
 
-Test commit from Codespaces.
-
 Welcome to the MultiversX Development Playground.
 
 Run `File > Open Workspace from File` and select the file `.devcontainer/default.code-workspace`. 
