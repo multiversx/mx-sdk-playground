@@ -31,8 +31,7 @@
                 }
             },
             "openFiles": [
-                ".devcontainer/default.code-workspace",
-                "README.md"
+                "playground.md"
             ]
         }
     }

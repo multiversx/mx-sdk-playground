@@ -2,9 +2,15 @@
 
 Welcome to the MultiversX Development Playground.
 
-Run `File > Open Workspace from File` and select the file `.devcontainer/default.code-workspace`. The window will reload and you will be ready to go.
+Run `File > Open Workspace from File` and select the file `.devcontainer/default.code-workspace`. 
+
+The window will reload and you will be ready to go.
 
 What to do:
 
- - Explorer the `Smart Contracts` folder, follow the `README.md` file, then create, build, test and deploy contracts.
- - Explorer the `Frontend` folder, follow the `README.md` file, then create and start dApps.
+ - Explore the [**Smart Contracts**](contracts) folder and follow the [`README.md`](contracts/README.md).
+ - Explore the [**Sandbox**](sandbox) folder and follow the [`README.md`](sandbox/README.md).
+ - Explore the [**Frontend**](frontend) folder and follow the [`README.md`](frontend/README.md).
+ - Explore the [**Snippets (Python)**](snippets/python) folder and follow the [`README.md`](snippets/python/README.md).
+ - Explore the [**Snippets (JavaScript)**](snippets/javascript) folder and follow the [`README.md`](snippets/python/README.md).
+
