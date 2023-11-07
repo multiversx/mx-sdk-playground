@@ -61,7 +61,7 @@ Deploy `Adder`:
 ```
 mxpy contract deploy --proxy=https://devnet-api.multiversx.com \
     --bytecode=./adder/output/adder.wasm --gas-limit=15000000 --arguments 0 \
-    --pem=../sandbox/wallet.pem --recall-nonce \
+    --pem=$SANDBOX/wallet.pem --recall-nonce \
     --send
 ```
 
@@ -69,8 +69,8 @@ Deploy `PingPong`:
 
 ```
 mxpy contract deploy --proxy=https://devnet-api.multiversx.com \
-    --bytecode=./adder/output/adder.wasm --gas-limit=15000000 --arguments 0 \
-    --pem=../sandbox/wallet.pem --recall-nonce \
+    --bytecode=./ping-pong-egld/output/ping-pong-egld.wasm --gas-limit=25000000 --arguments 1000000000000000000 120 0x00 \
+    --pem=$SANDBOX/wallet.pem --recall-nonce \
     --send
 ```
 
