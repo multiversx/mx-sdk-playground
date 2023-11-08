@@ -4,7 +4,7 @@ Welcome to the MultiversX Development Playground.
 
 ## Sandbox
 
-In the sandbox folder you can put files such as test wallets, pre-built test contracts and so on. 
+In the sandbox folder you can put files such as **test wallets**, **pre-built test contracts** and so on. 
 
 Do not add any important files here.
 

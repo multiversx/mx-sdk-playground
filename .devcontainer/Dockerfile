@@ -4,7 +4,7 @@ ARG USERNAME=developer
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-ARG MXPY_VERSION="v8.1.5"
+ARG MXPY_VERSION="v8.1.6"
 ARG RUST_VERSION="nightly-2023-05-26"
 ARG WASM_OPT_VERSION="version_112"
 ARG VMTOOLS_VERSION="v1.4.89"
@@ -80,7 +80,7 @@ RUN pip3 install multiversx-sdk-core==${PY_SDK_CORE_VERSION} && \
     pip3 install multiversx-sdk-network-providers==${PY_SDK_NETWORK_PROVIDERS_VERSION}
 
 # Install MultiversX libraries (JavaScript)
-ARG JS_SDK_CORE_VERSION="v12.12.0"
+ARG JS_SDK_CORE_VERSION="v12.13.0"
 ARG JS_SDK_WALLET_VERSION="v4.2.0"
 ARG JS_SDK_NETWORK_PROVIDERS_VERSION="v2.0.0"
 
