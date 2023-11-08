@@ -1,0 +1,17 @@
+contracts/**
+!contracts/Cargo.toml
+
+snippets-python/__pycache__
+
+sandbox/**
+sandbox/!.gitignore
+sandbox/!README.md
+sandbox/!alice.pem
+sandbox/!bob.pem
+sandbox/!carol.pem
+sandbox/!counter.abi.json
+sandbox/!counter.wasm
+sandbox/!lottery-esdt.abi.json
+sandbox/!lottery-esdt.wasm
+sandbox/!adder.abi.json
+sandbox/!adder.wasm

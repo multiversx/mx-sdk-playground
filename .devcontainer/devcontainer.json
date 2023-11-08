@@ -11,7 +11,10 @@
         "vscode": {
             "extensions": [
                 "rust-lang.rust-analyzer",
-                "vadimcn.vscode-lldb"
+                "vadimcn.vscode-lldb",
+                "ms-python.python",
+                "ms-python.autopep8",
+                "GitHub.copilot"
             ],
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "bash",
@@ -25,7 +28,10 @@
         "codespaces": {
             "extensions": [
                 "rust-lang.rust-analyzer",
-                "vadimcn.vscode-lldb"
+                "vadimcn.vscode-lldb",
+                "ms-python.python",
+                "ms-python.autopep8",
+                "GitHub.copilot"
             ],
             "settings": {
                 "terminal.integrated.env.linux": {},

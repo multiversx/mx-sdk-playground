@@ -1,0 +1,14 @@
+{
+    "include": [],
+    "exclude": [
+        "**/__pycache__"
+    ],
+    "ignore": [],
+    "defineConstant": {
+        "DEBUG": true
+    },
+    "stubPath": "",
+    "reportMissingImports": true,
+    "reportMissingTypeStubs": false,
+    "reportUnknownParameterType": true
+}
