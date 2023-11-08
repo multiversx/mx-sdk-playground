@@ -2,18 +2,10 @@
     "image": "multiversx/development-playground:latest",
     "remoteEnv": {
         "CONTRACTS": "${containerWorkspaceFolder}/contracts",
-        "FRONTEND": "${containerWorkspaceFolder}/frontend",
         "SNIPPETS_PY": "${containerWorkspaceFolder}/snippets/python",
         "SNIPPETS_JS": "${containerWorkspaceFolder}/snippets/javascript",
         "SANDBOX": "${containerWorkspaceFolder}/sandbox",
         "TESTWALLETS": "/home/developer/multiversx-sdk/testwallets/latest/users"
-    },
-    "portsAttributes": {
-        "3000": {
-            "label": "dApp",
-            "onAutoForward": "notify",
-            "protocol": "https"
-        }
     },
     "customizations": {
         "vscode": {

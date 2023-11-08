@@ -5,10 +5,6 @@
             "path": "../contracts"
         },
         {
-            "name": "Frontend (dApps)",
-            "path": "../frontend"
-        },
-        {
             "name": "Snippets (Python)",
             "path": "../snippets/python"
         },
