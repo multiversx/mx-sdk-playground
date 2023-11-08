@@ -103,4 +103,12 @@ Upon deployment, make sure to retain the addresses of the newly deploy contracts
 
 ## Snippets
 
-TBD
+### Python snippets
+
+```
+cd $SNIPPETS_PY
+
+python3 adder.py deploy --bytecode=$SANDBOX/adder.wasm
+python3 adder.py add --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu --value=7
+python3 adder.py get-sum --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu
+```
