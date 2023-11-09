@@ -1,9 +1,6 @@
 [workspace]
 resolver = "2"
 
+# Add contracts, as needed. Follow the instructions in "welcome.md".
 members = [
-    "adder",
-    "adder/meta",
-    "ping-pong-egld",
-    "ping-pong-egld/meta"
 ]

@@ -1,6 +1,8 @@
 # mx-sdk-playground
 
-Playground for contracts and dApps.
+Playground for contracts and dApps, shaped as a devcontainer for GitHub Codespaces or Visual Studio Code.
+
+Includes commonly-used tools and libraries for developing on the MultiversX platform: `Rust`, `mxpy`, `sc-meta`, `rust-analyzer` (extension), MultiversX SDKs for Python and JavaScript, and more.
 
 ## Open in Codespaces
 
@@ -15,3 +17,7 @@ If you already have **VS Code** and **Docker** installed, you can click on the b
 <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/multiversx/mx-sdk-playground">
     <img alt="Open in Dev Containers" src="https://img.shields.io/static/v1?label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode" height="26px" />
 </a>
+
+## What to do in the Playground
+
+See the [**Welcome**](./welcome.md) page for a list of things to do in the playground.
