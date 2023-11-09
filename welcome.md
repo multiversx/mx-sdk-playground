@@ -105,10 +105,20 @@ Upon deployment, make sure to retain the addresses of the newly deploy contracts
 
 ### Python snippets
 
-```
-cd $SNIPPETS_PY
+The folder `snippets-python` contains a few Python scripts (examples) that can be used to interact with the network and with some test contracts. Feel free to add more scripts, or to add more functionality to the existing ones.
 
-python3 adder.py deploy --bytecode=$SANDBOX/adder.wasm
-python3 adder.py add --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu --value=7
-python3 adder.py get-sum --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu
+```
+python3 $SNIPPETS_PY/adder.py deploy --bytecode=$SANDBOX/adder.wasm
+python3 $SNIPPETS_PY/adder.py add --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu --value=7
+python3 $SNIPPETS_PY/adder.py get-sum --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu
+```
+
+### Javascript snippets
+
+The folder `snippets-javascript` contains a few Javascript scripts (examples) that can be used to interact with the network and with some test contracts. Feel free to add more scripts, or to add more functionality to the existing ones.
+
+```
+node $SNIPPETS_JS/adder.js deploy --bytecode=$SANDBOX/adder.wasm
+node $SNIPPETS_JS/adder.js add --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu --value=7
+node $SNIPPETS_JS/adder.js get-sum --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu
 ```

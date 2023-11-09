@@ -5,13 +5,11 @@ from argparse import ArgumentParser
 from pathlib import Path
 from typing import Any, List
 
-from multiversx_sdk_core.transaction_factories import TransactionsFactoryConfig, SmartContractTransactionsFactory
-from multiversx_sdk_core import AddressComputer, ContractQueryBuilder, TokenComputer, Address, Transaction, TransactionComputer
-from multiversx_sdk_wallet import UserSigner
+from multiversx_sdk_core import AddressComputer, Address
 from multiversx_sdk_core.codec import decode_unsigned_number
-from constants import API_URL, CHAIN_ID, EXPLORER_URL
+from shared import broadcast_transaction, create_smart_contract_transactions_factory, query_contract, recall_nonce, sign_transaction
+from constants import EXPLORER_URL
 from wallet import pick_a_signer
-from multiversx_sdk_network_providers import ApiNetworkProvider
 
 
 GAS_LIMIT_DEPLOY = 15000000
@@ -46,7 +44,7 @@ def main(cli_args: List[str]):
 def deploy(args: Any):
     bytecode_path = args.bytecode
     signer, signer_address = pick_a_signer()
-    factory = create_transactions_factory()
+    factory = create_smart_contract_transactions_factory()
 
     transaction = factory.create_transaction_for_deploy(
         sender=signer_address,
@@ -71,7 +69,7 @@ def add(args: Any):
     value = args.value
 
     signer, signer_address = pick_a_signer()
-    factory = create_transactions_factory()
+    factory = create_smart_contract_transactions_factory()
 
     transaction = factory.create_transaction_for_execute(
         sender=signer_address,
@@ -89,14 +87,12 @@ def add(args: Any):
 def get_sum(args: Any):
     contract_address = Address.new_from_bech32(args.contract)
 
-    query = ContractQueryBuilder(
-        contract=contract_address,
+    response = query_contract(
+        address=contract_address,
         function="getSum",
-        call_arguments=[]
-    ).build()
+        arguments=[]
+    )
 
-    network_provider = create_network_provider()
-    response = network_provider.query_contract(query)
     [value_base64, ] = response.return_data
     value_bytes = base64.b64decode(value_base64)
     value = decode_unsigned_number(value_bytes)
@@ -104,37 +100,6 @@ def get_sum(args: Any):
     print("Return code:", response.return_code)
     print("Return data:", response.return_data)
     print("Sum:", value)
-
-
-def recall_nonce(transaction: Transaction):
-    network_provider = create_network_provider()
-    sender = Address.new_from_bech32(transaction.sender)
-    account = network_provider.get_account(sender)
-    transaction.nonce = account.nonce
-
-
-def sign_transaction(transaction: Transaction, signer: UserSigner):
-    computer = TransactionComputer()
-    bytes_for_signing = computer.compute_bytes_for_signing(transaction)
-    transaction.signature = signer.sign(bytes_for_signing)
-
-
-def broadcast_transaction(transaction: Transaction):
-    network_provider = create_network_provider()
-    hash = network_provider.send_transaction(transaction)
-
-    print("See transaction:")
-    print(f"{EXPLORER_URL}/transactions/{hash}")
-
-
-def create_transactions_factory():
-    factory_config = TransactionsFactoryConfig(CHAIN_ID)
-    factory = SmartContractTransactionsFactory(factory_config, TokenComputer())
-    return factory
-
-
-def create_network_provider():
-    return ApiNetworkProvider(API_URL)
 
 
 if __name__ == "__main__":
