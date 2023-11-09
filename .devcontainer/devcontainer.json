@@ -1,0 +1,50 @@
+{
+    "image": "multiversx/development-playground:latest",
+    "remoteEnv": {
+        "CONTRACTS": "${containerWorkspaceFolder}/contracts",
+        "SNIPPETS_PY": "${containerWorkspaceFolder}/snippets-python",
+        "SNIPPETS_JS": "${containerWorkspaceFolder}/snippets-javascript",
+        "SANDBOX": "${containerWorkspaceFolder}/sandbox",
+        "TESTWALLETS": "/home/developer/multiversx-sdk/testwallets/latest/users"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "vadimcn.vscode-lldb",
+                "ms-python.python",
+                "ms-python.autopep8",
+                "GitHub.copilot"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/usr/bin/bash"
+                    }
+                }
+            }
+        },
+        "codespaces": {
+            "extensions": [
+                "rust-lang.rust-analyzer",
+                "vadimcn.vscode-lldb",
+                "ms-python.python",
+                "ms-python.autopep8",
+                "GitHub.copilot"
+            ],
+            "settings": {
+                "terminal.integrated.env.linux": {},
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/usr/bin/bash"
+                    }
+                }
+            },
+            "openFiles": [
+                "welcome.md"
+            ]
+        }
+    }
+}
