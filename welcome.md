@@ -2,6 +2,18 @@
 
 Welcome to the MultiversX Development Playground.
 
+## Test wallet
+
+Create a test wallet on `Devnet`: https://devnet-wallet.multiversx.com. You can fund the newly created account directly from the Devnet Wallet (click on _Faucet_).
+
+Then, place the test wallet (e.g. `wallet.json`) in the `sandbox` folder.
+
+Alternatively, you can create a test wallet using `mxpy` (then fund it from the Devnet Wallet):
+
+```
+mxpy wallet new --format=keystore-mnemonic --outfile=$SANDBOX/wallet.json
+```
+
 ## Sandbox
 
 In the sandbox folder you can put files such as **test wallets**, **pre-built test contracts** and so on. 
@@ -15,13 +27,13 @@ Do not add any important files here.
 Create a contract using the `Adder` (contract) as a starting point (template):
 
 ```
-mxpy contract new --template=adder --directory=$CONTRACTS adder
+mxpy contract new --template=adder --name=adder --path=$CONTRACTS
 ```
 
 Create a contract using the `PingPong` (contract) as a starting point (template):
 
 ```
-mxpy contract new --template=ping-pong-egld --directory=$CONTRACTS ping-pong-egld
+mxpy contract new --template=ping-pong-egld --name=ping-pong --path=$CONTRACTS
 ```
 
 Upon creating a contract, make sure to reference it (and its `meta` crate) in `contracts/Cargo.toml`. For example:
@@ -33,8 +45,8 @@ resolver = "2"
 members = [
     "adder",
     "adder/meta",
-    "ping-pong-egld",
-    "ping-pong-egld/meta"
+    "ping-pong",
+    "ping-pong/meta"
 ]
 
 ```
@@ -52,9 +64,9 @@ stat $CONTRACTS/adder/output/adder.wasm
 Build a contract that exists in the folder `ping-pong-egld` (relative path):
 
 ```
-mxpy contract build --path=$CONTRACTS/ping-pong-egld
+mxpy contract build --path=$CONTRACTS/ping-pong
 
-stat $CONTRACTS/adder/output/ping-pong-egld.wasm
+stat $CONTRACTS/ping-pong/output/ping-pong-egld.wasm
 ```
 
 ### Running tests
@@ -71,11 +83,13 @@ cargo test
 Run tests for `PingPong`:
 
 ```
-cd $CONTRACTS/ping-pong-egld
+cd $CONTRACTS/ping-pong
 
 mxpy contract test
 cargo test
 ```
+
+**Note:** some tests may fail due to incorrect paths - not completely handled when creating a new contract based on a template (as of November 2023). Make sure to manually fix the incorrect paths in the test files.
 
 ### Deploying contracts
 
@@ -86,7 +100,7 @@ Deploy `Adder`:
 ```
 mxpy contract deploy --proxy=https://devnet-api.multiversx.com \
     --bytecode=$CONTRACTS/adder/output/adder.wasm --gas-limit=15000000 --arguments 0 \
-    --pem=$SANDBOX/wallet.pem --recall-nonce \
+    --keyfile=$SANDBOX/wallet.json --recall-nonce \
     --send
 ```
 
@@ -94,8 +108,8 @@ Deploy `PingPong`:
 
 ```
 mxpy contract deploy --proxy=https://devnet-api.multiversx.com \
-    --bytecode=$CONTRACTS/ping-pong-egld/output/ping-pong-egld.wasm --gas-limit=25000000 --arguments 1000000000000000000 600 0x00 \
-    --pem=$SANDBOX/wallet.pem --recall-nonce \
+    --bytecode=$CONTRACTS/ping-pong/output/ping-pong-egld.wasm --gas-limit=25000000 --arguments 1000000000000000000 600 0x00 \
+    --keyfile=$SANDBOX/wallet.json --recall-nonce \
     --send
 ```
 
@@ -109,8 +123,8 @@ The folder `snippets-python` contains a few Python scripts (examples) that can b
 
 ```
 python3 $SNIPPETS_PY/adder.py deploy --bytecode=$SANDBOX/adder.wasm
-python3 $SNIPPETS_PY/adder.py add --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu --value=7
-python3 $SNIPPETS_PY/adder.py get-sum --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu
+python3 $SNIPPETS_PY/adder.py add --contract=erd1qqqqqqqqqqqqqpgql5sllxejp8a9qzcn5qh6uvgqgk349p9ysv7sq26xhh --value=7
+python3 $SNIPPETS_PY/adder.py get-sum --contract=erd1qqqqqqqqqqqqqpgql5sllxejp8a9qzcn5qh6uvgqgk349p9ysv7sq26xhh
 ```
 
 ### Javascript snippets
@@ -119,6 +133,6 @@ The folder `snippets-javascript` contains a few Javascript scripts (examples) th
 
 ```
 node $SNIPPETS_JS/adder.js deploy --bytecode=$SANDBOX/adder.wasm
-node $SNIPPETS_JS/adder.js add --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu --value=7
-node $SNIPPETS_JS/adder.js get-sum --contract=erd1qqqqqqqqqqqqqpgq4f6lm4mppra83zrz5r68f8ysutx7xqlrd8ssu2a8gu
+node $SNIPPETS_JS/adder.js add --contract=erd1qqqqqqqqqqqqqpgql5sllxejp8a9qzcn5qh6uvgqgk349p9ysv7sq26xhh --value=7
+node $SNIPPETS_JS/adder.js get-sum --contract=erd1qqqqqqqqqqqqqpgql5sllxejp8a9qzcn5qh6uvgqgk349p9ysv7sq26xhh
 ```
