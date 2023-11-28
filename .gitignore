@@ -7,8 +7,11 @@ sandbox/**
 sandbox/!.gitignore
 sandbox/!README.md
 sandbox/!alice.pem
+sandbox/!alice.json
 sandbox/!bob.pem
+sandbox/!bob.json
 sandbox/!carol.pem
+sandbox/!carol.json
 sandbox/!counter.abi.json
 sandbox/!counter.wasm
 sandbox/!lottery-esdt.abi.json

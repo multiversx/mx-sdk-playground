@@ -4,6 +4,6 @@ resolver = "2"
 members = [
     "adder",
     "adder/meta",
-    "ping-pong-egld",
-    "ping-pong-egld/meta"
+    "ping-pong",
+    "ping-pong/meta
 ]
