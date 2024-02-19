@@ -16,7 +16,7 @@ mxpy wallet new --format=keystore-mnemonic --outfile=$SANDBOX/wallet.json
 
 ## Sandbox
 
-In the sandbox folder you can put files such as **test wallets**, **pre-built test contracts** and so on. 
+In the sandbox folder you can put files such as **test wallets**, **pre-built test contracts** and so on.
 
 Do not add any important files here.
 
@@ -27,13 +27,13 @@ Do not add any important files here.
 Create a contract using the `Adder` (contract) as a starting point (template):
 
 ```
-mxpy contract new --template=adder --name=adder --path=$CONTRACTS
+sc-meta new --template=adder --name=adder --path=$CONTRACTS
 ```
 
 Create a contract using the `PingPong` (contract) as a starting point (template):
 
 ```
-mxpy contract new --template=ping-pong-egld --name=ping-pong --path=$CONTRACTS
+sc-meta new --template=ping-pong-egld --name=ping-pong --path=$CONTRACTS
 ```
 
 Upon creating a contract, make sure to reference it (and its `meta` crate) in `contracts/Cargo.toml`. For example:
@@ -56,7 +56,7 @@ members = [
 Build a contract that exists in the folder `adder` (relative path):
 
 ```
-mxpy contract build --path=$CONTRACTS/adder
+sc-meta all build --path=$CONTRACTS/adder
 
 stat $CONTRACTS/adder/output/adder.wasm
 ```
@@ -64,7 +64,7 @@ stat $CONTRACTS/adder/output/adder.wasm
 Build a contract that exists in the folder `ping-pong-egld` (relative path):
 
 ```
-mxpy contract build --path=$CONTRACTS/ping-pong
+sc-meta all build --path=$CONTRACTS/ping-pong
 
 stat $CONTRACTS/ping-pong/output/ping-pong-egld.wasm
 ```
@@ -74,19 +74,13 @@ stat $CONTRACTS/ping-pong/output/ping-pong-egld.wasm
 Run tests for `Adder`:
 
 ```
-cd $CONTRACTS/adder
-
-mxpy contract test
-cargo test
+sc-meta test --path=$CONTRACTS/adder
 ```
 
 Run tests for `PingPong`:
 
 ```
-cd $CONTRACTS/ping-pong
-
-mxpy contract test
-cargo test
+sc-meta test --path=$CONTRACTS/ping-pong
 ```
 
 **Note:** some tests may fail due to incorrect paths - not completely handled when creating a new contract based on a template (as of November 2023). Make sure to manually fix the incorrect paths in the test files.
