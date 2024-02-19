@@ -2,6 +2,8 @@ contracts/**
 !contracts/Cargo.toml
 
 snippets-python/__pycache__
+snippets-javascript/node_modules
+snippets-javascript/package-lock.json
 
 sandbox/**
 sandbox/!.gitignore
