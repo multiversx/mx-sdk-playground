@@ -36,19 +36,13 @@ Create a contract using the `PingPong` (contract) as a starting point (template)
 sc-meta new --template=ping-pong-egld --name=ping-pong --path=$CONTRACTS
 ```
 
-Upon creating a contract, make sure to reference it (and its `meta` crate) in `contracts/Cargo.toml`. For example:
+Upon creating a contract, make sure to reference it in `.vscode/settings.json`, so that `rust-analyzer` is able to discover it:
 
 ```
-[workspace]
-resolver = "2"
-
-members = [
-    "adder",
-    "adder/meta",
-    "ping-pong",
-    "ping-pong/meta"
+"rust-analyzer.linkedProjects": [
+    "contracts/adder/Cargo.toml",
+    "contracts/ping-pong/Cargo.toml"
 ]
-
 ```
 
 ### Building contracts
@@ -83,7 +77,7 @@ Run tests for `PingPong`:
 sc-meta test --path=$CONTRACTS/ping-pong
 ```
 
-**Note:** some tests may fail due to incorrect paths - not completely handled when creating a new contract based on a template (as of November 2023). Make sure to manually fix the incorrect paths in the test files.
+**Note:** some tests may fail due to incorrect paths - not completely handled when creating a new contract based on a template (as of February 2024). Make sure to manually fix the incorrect paths in the test files.
 
 ### Deploying contracts
 

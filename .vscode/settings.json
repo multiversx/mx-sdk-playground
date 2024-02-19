@@ -1,7 +1,5 @@
 {
-    "rust-analyzer.linkedProjects": [
-        "contracts/Cargo.toml"
-    ],
+    "rust-analyzer.linkedProjects": [],
     "python.testing.pytestArgs": [
         "multiversx_sdk_cli"
     ],
