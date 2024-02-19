@@ -53,7 +53,7 @@ RUN cargo install multiversx-sc-meta --locked --version ${VERSION_SC_META} && \
 
 RUN sc-meta install all
 
-# Temporary workaround (until paths fixes in mx-sdk-rs are released):
+# Temporary workaround (until fixes in mx-sdk-rs are released):
 # https://github.com/multiversx/mx-sdk-rs/pull/1424
 COPY "./run-scenarios" /home/${USERNAME}/.cargo/bin/run-scenarios
 
