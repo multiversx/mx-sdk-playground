@@ -77,11 +77,4 @@ RUN pip3 install multiversx-sdk-core==${PY_SDK_CORE_VERSION} && \
     pip3 install multiversx-sdk-wallet==${PY_SDK_WALLET_VERSION} && \
     pip3 install multiversx-sdk-network-providers==${PY_SDK_NETWORK_PROVIDERS_VERSION}
 
-# Install MultiversX libraries (JavaScript)
-ARG JS_SDK_CORE_VERSION="v12.15.0"
-ARG JS_SDK_WALLET_VERSION="v4.2.0"
-ARG JS_SDK_NETWORK_PROVIDERS_VERSION="v2.2.0"
-
-RUN npm install -g @multiversx/sdk-core@${JS_SDK_CORE_VERSION} && \
-    npm install -g @multiversx/sdk-wallet@${JS_SDK_WALLET_VERSION} && \
-    npm install -g @multiversx/sdk-network-providers@${JS_SDK_NETWORK_PROVIDERS_VERSION}
+# Note: MultiversX libraries for JavaScript / TypeScript aren't installed globally.
