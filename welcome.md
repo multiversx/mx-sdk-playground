@@ -77,8 +77,6 @@ Run tests for `PingPong`:
 sc-meta test --path=$CONTRACTS/ping-pong
 ```
 
-**Note:** some tests may fail due to incorrect paths - not completely handled when creating a new contract based on a template (as of February 2024). Make sure to manually fix the incorrect paths in the test files.
-
 ### Deploying contracts
 
 The WASM bytecode files can be found in the `output` subirectory of each contract (upon a successful build).
