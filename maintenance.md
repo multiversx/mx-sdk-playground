@@ -13,3 +13,9 @@ Push the Docker image:
 ```
 docker push multiversx/development-playground:latest
 ```
+
+Test the devcontainer by running the Visual Studio command:
+
+```
+Dev Containers: Rebuild and Reopen in Container
+```

@@ -1,6 +1,0 @@
-[workspace]
-resolver = "2"
-
-# Add contracts, as needed. Follow the instructions in "welcome.md".
-members = [
-]
