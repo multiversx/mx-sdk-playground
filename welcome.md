@@ -6,12 +6,12 @@ Welcome to the MultiversX Development Playground.
 
 Create a test wallet on `Devnet`: https://devnet-wallet.multiversx.com. You can fund the newly created account directly from the Devnet Wallet (click on _Faucet_).
 
-Then, place the test wallet (e.g. `wallet.json`) in the `sandbox` folder.
+Then, place the test wallet (e.g. `wallet.pem`) in the `sandbox` folder.
 
 Alternatively, you can create a test wallet using `mxpy` (then fund it from the Devnet Wallet):
 
 ```
-mxpy wallet new --format=keystore-mnemonic --outfile=$SANDBOX/wallet.json
+mxpy wallet new --format=pem --outfile=$SANDBOX/wallet.pem
 ```
 
 ## Sandbox
@@ -86,7 +86,7 @@ Deploy `Adder`:
 ```
 mxpy contract deploy --proxy=https://devnet-api.multiversx.com \
     --bytecode=$CONTRACTS/adder/output/adder.wasm --gas-limit=15000000 --arguments 0 \
-    --keyfile=$SANDBOX/wallet.json --recall-nonce \
+    --pem=$SANDBOX/wallet.pem --recall-nonce \
     --send
 ```
 
@@ -95,7 +95,7 @@ Deploy `PingPong`:
 ```
 mxpy contract deploy --proxy=https://devnet-api.multiversx.com \
     --bytecode=$CONTRACTS/ping-pong/output/ping-pong-egld.wasm --gas-limit=25000000 --arguments 1000000000000000000 600 0x00 \
-    --keyfile=$SANDBOX/wallet.json --recall-nonce \
+    --pem=$SANDBOX/wallet.pem --recall-nonce \
     --send
 ```
 
@@ -111,14 +111,4 @@ The folder `snippets-python` contains a few Python scripts (examples) that can b
 python3 $SNIPPETS_PY/adder.py deploy --bytecode=$SANDBOX/adder.wasm
 python3 $SNIPPETS_PY/adder.py add --contract=erd1qqqqqqqqqqqqqpgql5sllxejp8a9qzcn5qh6uvgqgk349p9ysv7sq26xhh --value=7
 python3 $SNIPPETS_PY/adder.py get-sum --contract=erd1qqqqqqqqqqqqqpgql5sllxejp8a9qzcn5qh6uvgqgk349p9ysv7sq26xhh
-```
-
-### Javascript snippets
-
-The folder `snippets-javascript` contains a few Javascript scripts (examples) that can be used to interact with the network and with some test contracts. Feel free to add more scripts, or to add more functionality to the existing ones.
-
-```
-node $SNIPPETS_JS/adder.js deploy --bytecode=$SANDBOX/adder.wasm
-node $SNIPPETS_JS/adder.js add --contract=erd1qqqqqqqqqqqqqpgql5sllxejp8a9qzcn5qh6uvgqgk349p9ysv7sq26xhh --value=7
-node $SNIPPETS_JS/adder.js get-sum --contract=erd1qqqqqqqqqqqqqpgql5sllxejp8a9qzcn5qh6uvgqgk349p9ysv7sq26xhh
 ```
