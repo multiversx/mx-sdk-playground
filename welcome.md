@@ -55,12 +55,12 @@ sc-meta all build --path=$CONTRACTS/adder
 stat $CONTRACTS/adder/output/adder.wasm
 ```
 
-Build a contract that exists in the folder `ping-pong-egld` (relative path):
+Build a contract that exists in the folder `ping-pong` (relative path):
 
 ```
 sc-meta all build --path=$CONTRACTS/ping-pong
 
-stat $CONTRACTS/ping-pong/output/ping-pong-egld.wasm
+stat $CONTRACTS/ping-pong/output/ping-pong.wasm
 ```
 
 ### Running tests
@@ -94,7 +94,7 @@ Deploy `PingPong`:
 
 ```
 mxpy contract deploy --proxy=https://devnet-api.multiversx.com \
-    --bytecode=$CONTRACTS/ping-pong/output/ping-pong-egld.wasm --gas-limit=25000000 --arguments 1000000000000000000 600 0x00 \
+    --bytecode=$CONTRACTS/ping-pong/output/ping-pong.wasm --gas-limit=25000000 --arguments 1000000000000000000 600 0x00 \
     --pem=$SANDBOX/wallet.pem --recall-nonce \
     --send
 ```
