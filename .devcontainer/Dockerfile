@@ -36,7 +36,7 @@ ENV PATH="/home/${USERNAME}/.cargo/bin:${PATH}"
 RUN python3 -m pip install --no-cache-dir --user pipx
 
 # Install mxpy
-ARG VERSION_MXPY="v9.4.1"
+ARG VERSION_MXPY="v9.5.1"
 RUN pipx install multiversx-sdk-cli==${VERSION_MXPY}
 
 # Install rust and other tools
