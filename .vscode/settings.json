@@ -1,15 +1,12 @@
 {
     "rust-analyzer.linkedProjects": [],
-    "python.testing.pytestArgs": [
-        "multiversx_sdk_cli"
-    ],
     "python.testing.pytestEnabled": true,
     "editor.formatOnSave": true,
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
     },
     "editor.codeActionsOnSave": {
-        "source.organizeImports": true
+        "source.organizeImports": "explicit"
     },
     "files.insertFinalNewline": true,
     "python.languageServer": "Pylance"

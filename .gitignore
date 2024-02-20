@@ -2,6 +2,9 @@ snippets-python/__pycache__
 snippets-javascript/node_modules
 snippets-javascript/package-lock.json
 
+contracts/**/target
+contracts/**/output
+
 sandbox/**
 sandbox/!.gitignore
 sandbox/!README.md
