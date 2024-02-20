@@ -1,13 +1,13 @@
 {
-  "rust-analyzer.linkedProjects": [],
-  "python.testing.pytestEnabled": true,
-  "editor.formatOnSave": true,
-  "[python]": {
-    "editor.defaultFormatter": "ms-python.autopep8"
-  },
-  "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit"
-  },
-  "files.insertFinalNewline": true,
-  "python.languageServer": "Pylance"
+    "rust-analyzer.linkedProjects": [],
+    "python.testing.pytestEnabled": true,
+    "editor.formatOnSave": true,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+    "files.insertFinalNewline": true,
+    "python.languageServer": "Pylance"
 }
