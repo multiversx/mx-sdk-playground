@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@multiversx/sdk-core": "13.0.0-alpha.2",
+    "@multiversx/sdk-network-providers": "2.2.0",
+    "@multiversx/sdk-wallet": "4.2.0",
+    "commander": "11.1.0"
+  }
+}
