@@ -1,12 +1,10 @@
 from typing import Any, Sequence
-from multiversx_sdk_core import Address, ContractQueryBuilder, Transaction, TransactionComputer
-from multiversx_sdk_network_providers import ApiNetworkProvider
-from multiversx_sdk_wallet import UserSigner
-
-from multiversx_sdk_core.transaction_factories import TransactionsFactoryConfig, SmartContractTransactionsFactory
-from multiversx_sdk_core import TokenComputer, Address
 
 from constants import API_URL, CHAIN_ID, EXPLORER_URL
+from multiversx_sdk import (Address, ApiNetworkProvider, ContractQueryBuilder,
+                            SmartContractTransactionsFactory, Transaction,
+                            TransactionComputer, TransactionsFactoryConfig,
+                            UserSigner)
 
 
 def recall_nonce(transaction: Transaction):
@@ -44,7 +42,7 @@ def query_contract(address: Address, function: str, arguments: Sequence[Any]) ->
 
 def create_smart_contract_transactions_factory():
     factory_config = TransactionsFactoryConfig(CHAIN_ID)
-    factory = SmartContractTransactionsFactory(factory_config, TokenComputer())
+    factory = SmartContractTransactionsFactory(factory_config)
     return factory
 
 
