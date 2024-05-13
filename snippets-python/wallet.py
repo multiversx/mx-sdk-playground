@@ -2,10 +2,9 @@ import getpass
 import os
 from pathlib import Path
 from typing import List, Tuple
-from multiversx_sdk_core import Address
 
-from multiversx_sdk_wallet import UserSigner
 from constants import HRP
+from multiversx_sdk import Address, UserSigner
 
 
 def pick_a_signer() -> Tuple[UserSigner, Address]:

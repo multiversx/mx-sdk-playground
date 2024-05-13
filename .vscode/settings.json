@@ -2,12 +2,9 @@
     "rust-analyzer.linkedProjects": [],
     "python.testing.pytestEnabled": true,
     "editor.formatOnSave": true,
-    "[python]": {
-        "editor.defaultFormatter": "ms-python.autopep8"
-    },
     "editor.codeActionsOnSave": {
-        "source.organizeImports": "explicit"
+        "source.organizeImports": "always"
     },
     "files.insertFinalNewline": true,
-    "python.languageServer": "Pylance"
+    "python.languageServer": "Default"
 }
