@@ -40,7 +40,7 @@ jobs:
         id: push
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./.devcontainer
           file: ./.devcontainer/Dockerfile
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' }}
