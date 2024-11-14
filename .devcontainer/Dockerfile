@@ -72,8 +72,8 @@ RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${VERSION_NODE}
 ENV PATH="/home/${USERNAME}/.nvm/versions/node/v${VERSION_NODE}/bin:${PATH}"
 
 # Install MultiversX libraries (Python)
-ARG SDK_PY="0.16.3"
+ARG SDK_PY_VERSION="0.16.3"
 
-RUN pip3 install multiversx-sdk==${SDK_PY}
+RUN pip3 install multiversx-sdk==${SDK_PY_VERSION}
 
 # Note: MultiversX libraries for JavaScript / TypeScript aren't installed globally.
