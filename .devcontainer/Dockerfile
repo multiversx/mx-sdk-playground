@@ -36,17 +36,17 @@ ENV PATH="/home/${USERNAME}/.cargo/bin:${PATH}"
 RUN python3 -m pip install --no-cache-dir --user pipx
 
 # Install mxpy
-ARG VERSION_MXPY="v9.5.1"
+ARG VERSION_MXPY="v9.8.1"
 RUN pipx install multiversx-sdk-cli==${VERSION_MXPY}
 
 # Install rust and other tools
-ARG VERSION_RUST="nightly-2023-12-11"
+ARG VERSION_RUST="1.82.0"
 RUN wget -O rustup.sh https://sh.rustup.rs && \
     chmod +x rustup.sh && \
     ./rustup.sh --verbose --default-toolchain ${VERSION_RUST} --target wasm32-unknown-unknown -y && \
     rm -rf /home/${USERNAME}/.cargo/registry/* && rm -rf /home/${USERNAME}/.cargo/git/*
 
-ARG VERSION_SC_META="0.47.4"
+ARG VERSION_SC_META="0.54.0"
 RUN cargo install multiversx-sc-meta --locked --version ${VERSION_SC_META} && \
     rustup component add rustfmt && \
     rm -rf /home/${USERNAME}/.cargo/registry/* && rm -rf /home/${USERNAME}/.cargo/git/*
@@ -61,8 +61,8 @@ COPY "./run-scenarios" /home/${USERNAME}/.cargo/bin/run-scenarios
 RUN mxpy deps install testwallets && rm ${MULTIVERSX}/*.tar.gz
 
 # Install Node JS
-ARG VERSION_NODE=20.9.0
-RUN wget -O install.sh https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh && \
+ARG VERSION_NODE=22
+RUN wget -O install.sh https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh && \
     chmod +x install.sh && \
     ./install.sh
 ENV NVM_DIR=/home/${USERNAME}/.nvm
@@ -72,12 +72,8 @@ RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${VERSION_NODE}
 ENV PATH="/home/${USERNAME}/.nvm/versions/node/v${VERSION_NODE}/bin:${PATH}"
 
 # Install MultiversX libraries (Python)
-ARG PY_SDK_CORE_VERSION="0.8.0"
-ARG PY_SDK_WALLET_VERSION="0.9.1"
-ARG PY_SDK_NETWORK_PROVIDERS_VERSION="0.13.0"
+ARG SDK_PY="0.16.3"
 
-RUN pip3 install multiversx-sdk-core==${PY_SDK_CORE_VERSION} && \
-    pip3 install multiversx-sdk-wallet==${PY_SDK_WALLET_VERSION} && \
-    pip3 install multiversx-sdk-network-providers==${PY_SDK_NETWORK_PROVIDERS_VERSION}
+RUN pip3 install multiversx-sdk==${SDK_PY}
 
 # Note: MultiversX libraries for JavaScript / TypeScript aren't installed globally.
