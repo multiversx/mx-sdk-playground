@@ -2,7 +2,7 @@ import getpass
 import os
 from pathlib import Path
 from typing import List, Tuple
-from multiversx_sdk_core import Address, UserSigner
+from multiversx_sdk import Address, UserSigner
 
 from constants import HRP
 

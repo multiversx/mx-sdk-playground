@@ -1,9 +1,10 @@
-from typing import Any, Sequence
+from typing import Any
 
 from multiversx_sdk import (
     Address,
     ApiNetworkProvider,
-    ContractQueryBuilder,
+    SmartContractController,
+    SmartContractQueryResponse,
     SmartContractTransactionsFactory,
     Transaction,
     TransactionComputer,
@@ -16,8 +17,7 @@ from constants import API_URL, CHAIN_ID, EXPLORER_URL
 
 def recall_nonce(transaction: Transaction):
     network_provider = create_network_provider()
-    sender = Address.new_from_bech32(transaction.sender)
-    account = network_provider.get_account(sender)
+    account = network_provider.get_account(transaction.sender)
     transaction.nonce = account.nonce
 
 
@@ -35,15 +35,15 @@ def broadcast_transaction(transaction: Transaction):
     print(f"{EXPLORER_URL}/transactions/{hash}")
 
 
-def query_contract(address: Address, function: str, arguments: Sequence[Any]) -> Any:
-    query = ContractQueryBuilder(
+def query_contract(address: Address, function: str, arguments: list[Any]) -> SmartContractQueryResponse:
+    sc_controller = SmartContractController(chain_id=CHAIN_ID, network_provider=create_network_provider())
+    query = sc_controller.create_query(
         contract=address,
         function=function,
-        call_arguments=arguments
-    ).build()
+        arguments=arguments
+    )
 
-    network_provider = create_network_provider()
-    response = network_provider.query_contract(query)
+    response = sc_controller.run_query(query)
     return response
 
 

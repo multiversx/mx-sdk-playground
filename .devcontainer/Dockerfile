@@ -16,7 +16,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
 
 # Install some dependencies as root
 RUN apt-get update && apt-get install -y \
-    wget \ 
+    wget \
     build-essential \
     python3.10 python3-pip python3.10-venv \
     git \
@@ -36,7 +36,7 @@ ENV PATH="/home/${USERNAME}/.cargo/bin:${PATH}"
 RUN python3 -m pip install --no-cache-dir --user pipx
 
 # Install mxpy
-ARG VERSION_MXPY="v9.8.1"
+ARG VERSION_MXPY="v9.10.2"
 RUN pipx install multiversx-sdk-cli==${VERSION_MXPY}
 
 # Install rust and other tools
@@ -72,7 +72,7 @@ RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${VERSION_NODE}
 ENV PATH="/home/${USERNAME}/.nvm/versions/node/v${VERSION_NODE}/bin:${PATH}"
 
 # Install MultiversX libraries (Python)
-ARG SDK_PY_VERSION="0.16.3"
+ARG SDK_PY_VERSION="1.0.0b3"
 
 RUN pip3 install multiversx-sdk==${SDK_PY_VERSION}
 

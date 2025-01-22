@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any, List
 
 from multiversx_sdk import AddressComputer, Address
-from multiversx_sdk.core.codec import decode_unsigned_number
 from shared import broadcast_transaction, create_smart_contract_transactions_factory, query_contract, recall_nonce, sign_transaction
 from constants import EXPLORER_URL
 from wallet import pick_a_signer
@@ -93,12 +92,11 @@ def get_sum(args: Any):
         arguments=[]
     )
 
-    [value_base64, ] = response.return_data
-    value_bytes = base64.b64decode(value_base64)
-    value = decode_unsigned_number(value_bytes)
+    [value_bytes] = response.return_data_parts
+    value = int.from_bytes(bytes=value_bytes, byteorder="big", signed=False)
 
     print("Return code:", response.return_code)
-    print("Return data:", response.return_data)
+    print("Return message:", response.return_message)
     print("Sum:", value)
 
 
