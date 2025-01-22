@@ -46,7 +46,7 @@ RUN wget -O rustup.sh https://sh.rustup.rs && \
     ./rustup.sh --verbose --default-toolchain ${VERSION_RUST} --target wasm32-unknown-unknown -y && \
     rm -rf /home/${USERNAME}/.cargo/registry/* && rm -rf /home/${USERNAME}/.cargo/git/*
 
-ARG VERSION_SC_META="0.54.0"
+ARG VERSION_SC_META="0.55.0"
 RUN cargo install multiversx-sc-meta --locked --version ${VERSION_SC_META} && \
     rustup component add rustfmt && \
     rm -rf /home/${USERNAME}/.cargo/registry/* && rm -rf /home/${USERNAME}/.cargo/git/*
