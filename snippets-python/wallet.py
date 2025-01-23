@@ -7,7 +7,7 @@ from multiversx_sdk import Address, UserSigner
 from constants import HRP
 
 
-def pick_a_signer() -> Tuple[UserSigner, Address]:
+def pick_a_signer() -> UserSigner:
     entries: List[Path] = []
 
     folder = Path(os.environ["SANDBOX"])
@@ -26,8 +26,7 @@ def pick_a_signer() -> Tuple[UserSigner, Address]:
     path = entries[choice]
 
     signer = create_signer_from_file(path)
-    signer_address = Address.from_bech32(signer.get_pubkey().to_address(HRP).to_bech32())
-    return signer, signer_address
+    return signer
 
 
 def create_signer_from_file(path: Path):

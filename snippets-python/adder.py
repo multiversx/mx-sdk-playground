@@ -1,12 +1,10 @@
-
-import base64
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import Any, List
+from typing import Any
 
-from multiversx_sdk import AddressComputer, Address
-from shared import broadcast_transaction, create_smart_contract_transactions_factory, query_contract, recall_nonce, sign_transaction
+from multiversx_sdk import Account, AddressComputer, Address, DevnetEntrypoint
+from multiversx_sdk.abi import Abi
 from constants import EXPLORER_URL
 from wallet import pick_a_signer
 
@@ -14,8 +12,10 @@ from wallet import pick_a_signer
 GAS_LIMIT_DEPLOY = 15000000
 GAS_LIMIT_ADD = 5000000
 
+sandbox = Path(__file__).parent.parent / "sandbox"
 
-def main(cli_args: List[str]):
+
+def main(cli_args: list[str]):
     parser = ArgumentParser()
     subparsers = parser.add_subparsers()
 
@@ -42,22 +42,29 @@ def main(cli_args: List[str]):
 
 def deploy(args: Any):
     bytecode_path = args.bytecode
-    signer, signer_address = pick_a_signer()
-    factory = create_smart_contract_transactions_factory()
+    signer = pick_a_signer()
+    account = Account(signer.secret_key)
 
-    transaction = factory.create_transaction_for_deploy(
-        sender=signer_address,
+    entrypoint = DevnetEntrypoint()
+    account.nonce = entrypoint.recall_account_nonce(account.address)
+
+    abi = Abi.load(sandbox / "adder.abi.json")
+    sc_controller = entrypoint.create_smart_contract_controller(abi)
+
+    transaction = sc_controller.create_transaction_for_deploy(
+        sender=account,
+        nonce=account.nonce,
         bytecode=bytecode_path,
         gas_limit=GAS_LIMIT_DEPLOY,
         arguments=[0]
     )
 
-    recall_nonce(transaction)
-    sign_transaction(transaction, signer)
-    broadcast_transaction(transaction)
+    hash = entrypoint.send_transaction(transaction)
+    print("See transaction:")
+    print(f"{EXPLORER_URL}/transactions/{hash.hex()}")
 
     address_computer = AddressComputer()
-    contract_address = address_computer.compute_contract_address(signer_address, transaction.nonce)
+    contract_address = address_computer.compute_contract_address(account.address, transaction.nonce)
 
     print("Contract address:")
     print(f"{EXPLORER_URL}/accounts/{contract_address.to_bech32()}")
@@ -67,33 +74,46 @@ def add(args: Any):
     contract_address = Address.new_from_bech32(args.contract)
     value = args.value
 
-    signer, signer_address = pick_a_signer()
-    factory = create_smart_contract_transactions_factory()
+    signer = pick_a_signer()
+    account = Account(signer.secret_key)
 
-    transaction = factory.create_transaction_for_execute(
-        sender=signer_address,
+    entrypoint = DevnetEntrypoint()
+    account.nonce = entrypoint.recall_account_nonce(account.address)
+
+    abi = Abi.load(sandbox / "adder.abi.json")
+    sc_controller = entrypoint.create_smart_contract_controller(abi)
+
+    transaction = sc_controller.create_transaction_for_execute(
+        sender=account,
+        nonce=account.nonce,
         contract=contract_address,
         function="add",
         gas_limit=GAS_LIMIT_ADD,
         arguments=[value]
     )
 
-    recall_nonce(transaction)
-    sign_transaction(transaction, signer)
-    broadcast_transaction(transaction)
+    hash = entrypoint.send_transaction(transaction)
+    print("See transaction:")
+    print(f"{EXPLORER_URL}/transactions/{hash.hex()}")
 
 
 def get_sum(args: Any):
     contract_address = Address.new_from_bech32(args.contract)
 
-    response = query_contract(
-        address=contract_address,
+    entrypoint = DevnetEntrypoint()
+
+    abi = Abi.load(sandbox / "adder.abi.json")
+    sc_controller = entrypoint.create_smart_contract_controller(abi)
+
+    query = sc_controller.create_query(
+        contract=contract_address,
         function="getSum",
         arguments=[]
     )
 
-    [value_bytes] = response.return_data_parts
-    value = int.from_bytes(bytes=value_bytes, byteorder="big", signed=False)
+    response = sc_controller.run_query(query)
+
+    value = sc_controller.parse_query_response(response)[0]
 
     print("Return code:", response.return_code)
     print("Return message:", response.return_message)
