@@ -72,7 +72,7 @@ RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${VERSION_NODE}
 ENV PATH="/home/${USERNAME}/.nvm/versions/node/v${VERSION_NODE}/bin:${PATH}"
 
 # Install MultiversX libraries (Python)
-ARG SDK_PY_VERSION="1.0.0b3"
+ARG SDK_PY_VERSION="1.0.0"
 
 RUN pip3 install multiversx-sdk==${SDK_PY_VERSION}
 
