@@ -4,6 +4,12 @@ ARG USERNAME=developer
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
+ARG VERSION_MXPY="11.1.1"
+ARG SDK_PY_VERSION="2.0.1"
+
+ARG VERSION_RUST="1.86.0"
+ARG VERSION_SC_META="0.59.0"
+
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
@@ -36,26 +42,26 @@ ENV PATH="/home/${USERNAME}/.cargo/bin:${PATH}"
 RUN python3 -m pip install --no-cache-dir --user pipx
 
 # Install mxpy
-ARG VERSION_MXPY="v9.10.2"
 RUN pipx install multiversx-sdk-cli==${VERSION_MXPY}
 
-# Install rust and other tools
-ARG VERSION_RUST="1.82.0"
+# Install rust
 RUN wget -O rustup.sh https://sh.rustup.rs && \
     chmod +x rustup.sh && \
-    ./rustup.sh --verbose --default-toolchain ${VERSION_RUST} --target wasm32-unknown-unknown -y && \
-    rm -rf /home/${USERNAME}/.cargo/registry/* && rm -rf /home/${USERNAME}/.cargo/git/*
+    CARGO_HOME=/home/${USERNAME}/.cargo RUSTUP_HOME=/home/${USERNAME}/.rustup ./rustup.sh --verbose --default-toolchain ${VERSION_RUST} --profile minimal -y && \
+    rm rustup.sh
 
-ARG VERSION_SC_META="0.54.0"
-RUN cargo install multiversx-sc-meta --locked --version ${VERSION_SC_META} && \
-    rustup component add rustfmt && \
-    rm -rf /home/${USERNAME}/.cargo/registry/* && rm -rf /home/${USERNAME}/.cargo/git/*
+# Install sc-meta tool
+RUN CARGO_HOME=/home/${USERNAME}/.cargo RUSTUP_HOME=/home/${USERNAME}/.rustup PATH="/home/${USERNAME}/.cargo/bin:${PATH}" \
+    cargo install multiversx-sc-meta --version ${VERSION_SC_META} --locked
 
-RUN sc-meta install all
+# Temporary workaround - Add settings.json for sc-meta dependencies
+RUN mkdir -p $HOME/.config/Code/User && \
+    echo '{}' > $HOME/.config/Code/User/settings.json
 
-# Temporary workaround (until fixes in mx-sdk-rs are released):
-# https://github.com/multiversx/mx-sdk-rs/pull/1424
-COPY "./run-scenarios" /home/${USERNAME}/.cargo/bin/run-scenarios
+# Install other tools
+RUN CARGO_HOME=/home/${USERNAME}/.cargo RUSTUP_HOME=/home/${USERNAME}/.rustup PATH="/home/${USERNAME}/.cargo/bin:${PATH}" \
+    sc-meta install all
+
 
 # Install test wallets
 RUN mxpy deps install testwallets && rm ${MULTIVERSX}/*.tar.gz
@@ -72,8 +78,6 @@ RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${VERSION_NODE}
 ENV PATH="/home/${USERNAME}/.nvm/versions/node/v${VERSION_NODE}/bin:${PATH}"
 
 # Install MultiversX libraries (Python)
-ARG SDK_PY_VERSION="1.0.0"
-
 RUN pip3 install multiversx-sdk==${SDK_PY_VERSION}
 
 # Note: MultiversX libraries for JavaScript / TypeScript aren't installed globally.
