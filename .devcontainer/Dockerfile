@@ -6,9 +6,9 @@ ARG USER_GID=$USER_UID
 
 ARG VERSION_MXPY="11.1.1"
 ARG SDK_PY_VERSION="2.0.1"
-
 ARG VERSION_RUST="1.86.0"
-ARG VERSION_SC_META="0.59.0"
+ARG VERSION_SC_META="0.62.0"
+ARG VERSION_NODE=22
 
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME \
@@ -50,15 +50,10 @@ RUN wget -O rustup.sh https://sh.rustup.rs && \
     CARGO_HOME=/home/${USERNAME}/.cargo RUSTUP_HOME=/home/${USERNAME}/.rustup ./rustup.sh --verbose --default-toolchain ${VERSION_RUST} --profile minimal -y && \
     rm rustup.sh
 
-# Install sc-meta tool
+# Install sc-meta tools
 RUN CARGO_HOME=/home/${USERNAME}/.cargo RUSTUP_HOME=/home/${USERNAME}/.rustup PATH="/home/${USERNAME}/.cargo/bin:${PATH}" \
     cargo install multiversx-sc-meta --version ${VERSION_SC_META} --locked
 
-# Temporary workaround - Add settings.json for sc-meta dependencies
-RUN mkdir -p $HOME/.config/Code/User && \
-    echo '{}' > $HOME/.config/Code/User/settings.json
-
-# Install other tools
 RUN CARGO_HOME=/home/${USERNAME}/.cargo RUSTUP_HOME=/home/${USERNAME}/.rustup PATH="/home/${USERNAME}/.cargo/bin:${PATH}" \
     sc-meta install all
 
@@ -67,7 +62,6 @@ RUN CARGO_HOME=/home/${USERNAME}/.cargo RUSTUP_HOME=/home/${USERNAME}/.rustup PA
 RUN mxpy deps install testwallets && rm ${MULTIVERSX}/*.tar.gz
 
 # Install Node JS
-ARG VERSION_NODE=22
 RUN wget -O install.sh https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh && \
     chmod +x install.sh && \
     ./install.sh
