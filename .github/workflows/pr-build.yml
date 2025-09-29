@@ -1,0 +1,39 @@
+env:
+  IMAGE_NAME: development-playground
+  REGISTRY_HOSTNAME: multiversx
+
+name: Build Docker image (PR)
+
+on:
+  pull_request:
+
+jobs:
+  build-docker-image:
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./.devcontainer
+          file: ./.devcontainer/Dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=ghcr.io/${{ github.repository }},digest
