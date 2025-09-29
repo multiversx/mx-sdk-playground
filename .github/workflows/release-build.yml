@@ -41,23 +41,23 @@ jobs:
           context: ./.devcontainer
           file: ./.devcontainer/Dockerfile
           push: true
-          tags: ''
+          tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}-${{ matrix.runner }}-${{ github.run_id }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,push-by-digest=true,name-canonical=true
 
-      - name: Export digest
-        if: steps.push.outputs.digest != ''
+      - name: Export image reference
+        if: steps.build.outputs.digest != ''
         run: |
-          mkdir -p ${{ runner.temp }}/digests
-          digest="${{ steps.push.outputs.digest }}"
-          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+          mkdir -p ${{ runner.temp }}/images
+          image_ref="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}-${{ matrix.runner }}-${{ github.run_id }}@${{ steps.build.outputs.digest }}"
+          echo "$image_ref" > ${{ runner.temp }}/images/ref.txt
 
-      - name: Upload digest
-        if: steps.push.outputs.digest != ''
+      - name: Upload image reference
+        if: steps.build.outputs.digest != ''
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ matrix.runner }}
-          path: ${{ runner.temp }}/digests/*
+          name: images-${{ matrix.runner }}
+          path: ${{ runner.temp }}/images/ref.txt
           if-no-files-found: ignore
           retention-days: 1
 
@@ -81,11 +81,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Download digests
+      - name: Download image references
         uses: actions/download-artifact@v4
         with:
-          path: ${{ runner.temp }}/digests
-          pattern: digests-*
+          path: ${{ runner.temp }}/images
+          pattern: images-*
           merge-multiple: true
 
       - name: Export metadata JSON
@@ -95,8 +95,8 @@ jobs:
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create multi-platform manifest and push
-        working-directory: ${{ runner.temp }}/digests
         run: |
+          image_refs=$(cat ${{ runner.temp }}/images/*.txt | tr '\n' ' ')
           docker buildx imagetools create \
             $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
+            $image_refs
