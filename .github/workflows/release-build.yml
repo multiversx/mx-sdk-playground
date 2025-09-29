@@ -54,7 +54,7 @@ jobs:
           context: ./.devcontainer
           file: ./.devcontainer/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-${{ matrix.arch.platform }}-${{ github.run_id }}
+          tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-${{ replace(matrix.arch.platform, '/', '_') }}-${{ github.run_id }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,push-by-digest=true,name-canonical=true
 
@@ -62,14 +62,15 @@ jobs:
         if: steps.build.outputs.digest != ''
         run: |
           mkdir -p ${{ runner.temp }}/images
-          image_ref="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-${{ matrix.arch.platform }}-${{ github.run_id }}@${{ steps.build.outputs.digest }}"
+          plat_tag="temp-${{ replace(matrix.arch.platform, '/', '_') }}-${{ github.run_id }}"
+          image_ref="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:${plat_tag}@${{ steps.build.outputs.digest }}"
           echo "$image_ref" > ${{ runner.temp }}/images/ref.txt
 
       - name: Upload image reference
         if: steps.build.outputs.digest != ''
         uses: actions/upload-artifact@v4
         with:
-          name: images-${{ matrix.arch.platform }}
+          name: images-${{ replace(matrix.arch.platform, '/', '_') }}
           path: ${{ runner.temp }}/images/ref.txt
           if-no-files-found: ignore
           retention-days: 1
@@ -110,8 +111,8 @@ jobs:
 
       - name: Create and push manifests
         run: |
-          amd64_ref=$(cat ${{ runner.temp }}/images/images-linux-amd64/ref.txt)
-          arm64_ref=$(cat ${{ runner.temp }}/images/images-linux-arm64/ref.txt)
+          amd64_ref=$(cat ${{ runner.temp }}/images/images-linux_amd64/ref.txt)
+          arm64_ref=$(cat ${{ runner.temp }}/images/images-linux_arm64/ref.txt)
           
           echo '${{ steps.meta.outputs.json }}' | jq -cr '.tags[]' | while read -r tag; do
             docker buildx imagetools create -t "$tag" "$amd64_ref" "$arm64_ref"
