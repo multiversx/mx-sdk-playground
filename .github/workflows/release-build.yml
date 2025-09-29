@@ -1,0 +1,102 @@
+env:
+  IMAGE_NAME: development-playground
+  REGISTRY_HOSTNAME: multiversx
+
+name: Build & push Docker image (Release)
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-docker-image:
+    strategy:
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push image to Docker Hub
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: ./.devcontainer
+          file: ./.devcontainer/Dockerfile
+          push: true
+          tags: ''
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,push-by-digest=true,name-canonical=true
+
+      - name: Export digest
+        if: steps.push.outputs.digest != ''
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.push.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        if: steps.push.outputs.digest != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.runner }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: ignore
+          retention-days: 1
+
+  create-manifest:
+    needs: build-docker-image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Export metadata JSON
+        run: |
+          echo "DOCKER_METADATA_OUTPUT_JSON<<EOF" >> $GITHUB_ENV
+          echo '${{ steps.meta.outputs.json }}' >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create multi-platform manifest and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
