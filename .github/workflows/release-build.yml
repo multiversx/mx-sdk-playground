@@ -7,6 +7,13 @@ name: Build & push Docker image (Release)
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Simulate release version (e.g., v0.4.2)'
+        required: false
+        default: ''
+        type: string
 
 jobs:
   build-docker-image:
@@ -24,6 +31,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha
+            ${{ github.event.inputs.version != '' && format('type=ref,event=pr,pattern={0}', github.event.inputs.version) || '' }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
