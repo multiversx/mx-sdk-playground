@@ -35,7 +35,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push image to Docker Hub
-        id: push
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: ./.devcontainer
@@ -43,7 +43,7 @@ jobs:
           push: true
           tags: ''
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=ghcr.io/${{ github.repository }},digest
+          outputs: type=image,push-by-digest=true,name-canonical=true
 
       - name: Export digest
         if: steps.push.outputs.digest != ''
