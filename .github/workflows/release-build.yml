@@ -54,7 +54,7 @@ jobs:
           context: ./.devcontainer
           file: ./.devcontainer/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}-${{ matrix.arch.platform }}-${{ github.run_id }}
+          tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-${{ matrix.arch.platform }}-${{ github.run_id }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,push-by-digest=true,name-canonical=true
 
@@ -62,7 +62,7 @@ jobs:
         if: steps.build.outputs.digest != ''
         run: |
           mkdir -p ${{ runner.temp }}/images
-          image_ref="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}-${{ matrix.arch.platform }}-${{ github.run_id }}@${{ steps.build.outputs.digest }}"
+          image_ref="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-${{ matrix.arch.platform }}-${{ github.run_id }}@${{ steps.build.outputs.digest }}"
           echo "$image_ref" > ${{ runner.temp }}/images/ref.txt
 
       - name: Upload image reference
