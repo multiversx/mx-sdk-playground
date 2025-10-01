@@ -53,8 +53,25 @@ jobs:
           context: ./.devcontainer
           file: ./.devcontainer/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-${{ matrix.arch.platform_tag }}-${{ github.run_id }}
+          tags: ''
           labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,push-by-digest=true,name-canonical=true
+
+      - name: Export image digest
+        if: steps.build.outputs.digest != ''
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          echo "${digest#sha256:}" > ${{ runner.temp }}/digests/${{ matrix.arch.platform_tag }}
+
+      - name: Upload image digest
+        if: steps.build.outputs.digest != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.arch.platform_tag }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: ignore
+          retention-days: 1
 
   manifest:
     runs-on: ubuntu-latest
@@ -82,21 +99,22 @@ jobs:
             type=raw,value=latest
             ${{ (github.event_name == 'release' && format('type=ref,event=tag')) || (github.event.inputs.version != '' && format('type=raw,value={0}', github.event.inputs.version)) || '' }}
 
+      - name: Download image digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
       - name: Create and push manifests
+        working-directory: ${{ runner.temp }}/digests
         run: |
-          amd64_tag="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-linux_amd64-${{ github.run_id }}"
-          arm64_tag="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-linux_arm64-${{ github.run_id }}"
+          amd64_digest=$(cat linux_amd64)
+          arm64_digest=$(cat linux_arm64)
+          
+          amd64_ref="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}@sha256:${amd64_digest}"
+          arm64_ref="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}@sha256:${arm64_digest}"
           
           echo '${{ steps.meta.outputs.json }}' | jq -cr '.tags[]' | while read -r tag; do
-            docker buildx imagetools create -t "$tag" "$amd64_tag" "$arm64_tag"
+            docker buildx imagetools create -t "$tag" "$amd64_ref" "$arm64_ref"
           done
-
-      - name: Cleanup temp tags
-        if: always()
-        run: |
-          amd64_temp="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-linux_amd64-${{ github.run_id }}"
-          arm64_temp="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-linux_arm64-${{ github.run_id }}"
-          
-          # Remove temp tags from Docker Hub (requires login)
-          docker rmi "$amd64_temp" || true
-          docker rmi "$arm64_temp" || true
