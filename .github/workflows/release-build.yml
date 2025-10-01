@@ -94,7 +94,7 @@ jobs:
             docker buildx imagetools create -t "$tag" "$amd64_tag" "$arm64_tag"
           done
 
-      - name: Cleanup temp tags
+      - name: Cleanup temp images
         if: always()
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -105,8 +105,28 @@ jobs:
           JWT=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\":\"$DOCKERHUB_USERNAME\",\"password\":\"$DOCKERHUB_TOKEN\"}" https://hub.docker.com/v2/users/login/ | jq -r .token)
           
           REPO="$REGISTRY_HOSTNAME/$IMAGE_NAME"
-          AMD64_TAG="temp-linux_amd64-${{ github.run_id }}"
-          ARM64_TAG="temp-linux_arm64-${{ github.run_id }}"
+          RUN_ID="${{ github.run_id }}"
           
-          curl -s -X DELETE -H "Authorization: JWT $JWT" "https://hub.docker.com/v2/repositories/$REPO/tags/$AMD64_TAG/" || true
-          curl -s -X DELETE -H "Authorization: JWT $JWT" "https://hub.docker.com/v2/repositories/$REPO/tags/$ARM64_TAG/" || true
+          # Function to cleanup a temp tag
+          cleanup_temp() {
+            local platform_tag=$1
+            local temp_tag="temp-$platform_tag-$RUN_ID"
+            
+            local response=$(curl -s -H "Authorization: JWT $JWT" "https://hub.docker.com/v2/repositories/$REPO/tags/$temp_tag/")
+            local digest=$(echo "$response" | jq -r '.images[0].digest // empty')
+            
+            if [ -n "$digest" ]; then
+              echo "Cleaning up $temp_tag (digest: $digest)"
+              
+              curl -s -X DELETE -H "Authorization: JWT $JWT" "https://hub.docker.com/v2/repositories/$REPO/tags/$temp_tag/" || true
+              
+              local service_token=$(curl -s -u "$DOCKERHUB_USERNAME:$DOCKERHUB_TOKEN" "https://hub.docker.com/v2/auth?scope=repository:$REPO:delete&service=registry.docker.io" | jq -r '.token')
+              
+              curl -s -X DELETE -H "Authorization: Bearer $service_token" "https://registry-1.docker.io/v2/$REPO/manifests/$digest" || true
+            else
+              echo "No digest found for $temp_tag"
+            fi
+          }
+          
+          cleanup_temp "linux_amd64"
+          cleanup_temp "linux_arm64"
