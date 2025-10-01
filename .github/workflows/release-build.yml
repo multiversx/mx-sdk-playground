@@ -20,8 +20,8 @@ jobs:
     strategy:
       matrix:
         arch:
-          - { runner: ubuntu-latest, platform: linux/amd64 }
-          - { runner: ubuntu-24.04-arm, platform: linux/arm64 }
+          - { runner: ubuntu-latest, platform: linux/amd64, platform_tag: linux_amd64 }
+          - { runner: ubuntu-24.04-arm, platform: linux/arm64, platform_tag: linux_arm64 }
     runs-on: ${{ matrix.arch.runner }}
 
     steps:
@@ -43,9 +43,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=sha
-            ${{ github.event.inputs.version != '' && format('type=raw,value={0}', github.event.inputs.version) || '' }}
+            type=raw,value=latest
+            ${{ (github.event_name == 'release' && format('type=ref,event=tag')) || (github.event.inputs.version != '' && format('type=raw,value={0}', github.event.inputs.version)) || '' }}
 
       - name: Build and push per-arch image
         id: build
@@ -54,25 +53,8 @@ jobs:
           context: ./.devcontainer
           file: ./.devcontainer/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}-${{ matrix.arch.platform }}-${{ github.run_id }}
+          tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-${{ matrix.arch.platform_tag }}-${{ github.run_id }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,push-by-digest=true,name-canonical=true
-
-      - name: Export image reference
-        if: steps.build.outputs.digest != ''
-        run: |
-          mkdir -p ${{ runner.temp }}/images
-          image_ref="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}-${{ matrix.arch.platform }}-${{ github.run_id }}@${{ steps.build.outputs.digest }}"
-          echo "$image_ref" > ${{ runner.temp }}/images/ref.txt
-
-      - name: Upload image reference
-        if: steps.build.outputs.digest != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: images-${{ matrix.arch.platform }}
-          path: ${{ runner.temp }}/images/ref.txt
-          if-no-files-found: ignore
-          retention-days: 1
 
   manifest:
     runs-on: ubuntu-latest
@@ -81,6 +63,9 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -97,22 +82,51 @@ jobs:
         with:
           images: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=sha
-            ${{ github.event.inputs.version != '' && format('type=raw,value={0}', github.event.inputs.version) || '' }}
-
-      - name: Download image references
-        uses: actions/download-artifact@v4
-        with:
-          path: ${{ runner.temp }}/images
-          pattern: images-*
-          merge-multiple: true
+            type=raw,value=latest
+            ${{ (github.event_name == 'release' && format('type=ref,event=tag')) || (github.event.inputs.version != '' && format('type=raw,value={0}', github.event.inputs.version)) || '' }}
 
       - name: Create and push manifests
         run: |
-          amd64_ref=$(cat ${{ runner.temp }}/images/images-linux-amd64/ref.txt)
-          arm64_ref=$(cat ${{ runner.temp }}/images/images-linux-arm64/ref.txt)
+          amd64_tag="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-linux_amd64-${{ github.run_id }}"
+          arm64_tag="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-linux_arm64-${{ github.run_id }}"
           
           echo '${{ steps.meta.outputs.json }}' | jq -cr '.tags[]' | while read -r tag; do
-            docker buildx imagetools create -t "$tag" "$amd64_ref" "$arm64_ref"
+            docker buildx imagetools create -t "$tag" "$amd64_tag" "$arm64_tag"
           done
+
+      - name: Cleanup temp tags
+        if: always()
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          REGISTRY_HOSTNAME: ${{ env.REGISTRY_HOSTNAME }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+        run: |
+          JWT=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\":\"$DOCKERHUB_USERNAME\",\"password\":\"$DOCKERHUB_TOKEN\"}" https://hub.docker.com/v2/users/login/ | jq -r '.token')
+          
+          REPO="$REGISTRY_HOSTNAME/$IMAGE_NAME"
+          RUN_ID="${{ github.run_id }}"
+          
+          cleanup_temp() {
+            local platform_tag=$1
+            local temp_tag="temp-$platform_tag-$RUN_ID"
+            
+            echo "Cleaning up tag: $temp_tag"
+            
+            local response=$(curl -s -w "%{http_code}" -X DELETE -H "Authorization: JWT $JWT" "https://hub.docker.com/v2/repositories/$REPO/tags/$temp_tag/")
+            local http_code="${response: -3}"
+            local body="${response%???}"
+            
+            if [ "$http_code" = "200" ] || [ "$http_code" = "204" ]; then
+              echo "Successfully deleted tag: $temp_tag"
+            elif [ "$http_code" = "404" ]; then
+              echo "Tag $temp_tag not found (already deleted or never existed)"
+            else
+              echo "Failed to delete tag $temp_tag (HTTP $http_code): $body"
+            fi
+          }
+          
+          cleanup_temp "linux_amd64"
+          cleanup_temp "linux_arm64"
+          
+          echo "Note: Temp layers will be garbage-collected by Docker Hub once unreferenced."
