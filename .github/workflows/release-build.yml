@@ -16,6 +16,22 @@ on:
         type: string
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+      tags-json: ${{ steps.meta.outputs.json }}
+      labels: ${{ steps.meta.outputs.labels }}
+    steps:
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            ${{ (github.event_name == 'release' && format('type=ref,event=tag')) || (github.event.inputs.version != '' && format('type=raw,value={0}', github.event.inputs.version)) || '' }}
+
   build:
     strategy:
       matrix:
@@ -23,7 +39,7 @@ jobs:
           - { runner: ubuntu-latest, platform: linux/amd64, platform_tag: linux_amd64 }
           - { runner: ubuntu-24.04-arm, platform: linux/arm64, platform_tag: linux_arm64 }
     runs-on: ${{ matrix.arch.runner }}
-
+    needs: prepare
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -37,35 +53,41 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest
-            ${{ (github.event_name == 'release' && format('type=ref,event=tag')) || (github.event.inputs.version != '' && format('type=raw,value={0}', github.event.inputs.version)) || '' }}
-
-      - name: Build and push per-arch image
+      - name: Build and push by digest
         id: build
         uses: docker/build-push-action@v6
         with:
           context: ./.devcontainer
           file: ./.devcontainer/Dockerfile
-          push: true
-          tags: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-${{ matrix.arch.platform_tag }}-${{ github.run_id }}
-          labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ matrix.arch.platform }}
+          labels: ${{ needs.prepare.outputs.labels }}
+          outputs: type=image,name=${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.arch.platform_tag }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
 
   manifest:
     runs-on: ubuntu-latest
-    needs: build
+    needs: [prepare, build]
 
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
-
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -76,57 +98,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest
-            ${{ (github.event_name == 'release' && format('type=ref,event=tag')) || (github.event.inputs.version != '' && format('type=raw,value={0}', github.event.inputs.version)) || '' }}
-
-      - name: Create and push manifests
-        run: |
-          amd64_tag="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-linux_amd64-${{ github.run_id }}"
-          arm64_tag="${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}:temp-linux_arm64-${{ github.run_id }}"
-          
-          echo '${{ steps.meta.outputs.json }}' | jq -cr '.tags[]' | while read -r tag; do
-            docker buildx imagetools create -t "$tag" "$amd64_tag" "$arm64_tag"
-          done
-
-      - name: Cleanup temp tags
-        if: always()
+      - name: Create and push manifest
+        working-directory: /tmp/digests
         env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          REGISTRY_HOSTNAME: ${{ env.REGISTRY_HOSTNAME }}
-          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+          TAGS_JSON: ${{ needs.prepare.outputs.tags-json }}
         run: |
-          JWT=$(curl -s -H "Content-Type: application/json" -X POST -d "{\"username\":\"$DOCKERHUB_USERNAME\",\"password\":\"$DOCKERHUB_TOKEN\"}" https://hub.docker.com/v2/users/login/ | jq -r '.token')
-          
-          REPO="$REGISTRY_HOSTNAME/$IMAGE_NAME"
-          RUN_ID="${{ github.run_id }}"
-          
-          cleanup_temp() {
-            local platform_tag=$1
-            local temp_tag="temp-$platform_tag-$RUN_ID"
-            
-            echo "Cleaning up tag: $temp_tag"
-            
-            local response=$(curl -s -w "%{http_code}" -X DELETE -H "Authorization: JWT $JWT" "https://hub.docker.com/v2/repositories/$REPO/tags/$temp_tag/")
-            local http_code="${response: -3}"
-            local body="${response%???}"
-            
-            if [ "$http_code" = "200" ] || [ "$http_code" = "204" ]; then
-              echo "Successfully deleted tag: $temp_tag"
-            elif [ "$http_code" = "404" ]; then
-              echo "Tag $temp_tag not found (already deleted or never existed)"
-            else
-              echo "Failed to delete tag $temp_tag (HTTP $http_code): $body"
-            fi
-          }
-          
-          cleanup_temp "linux_amd64"
-          cleanup_temp "linux_arm64"
-          
-          echo "Note: Temp layers will be garbage-collected by Docker Hub once unreferenced."
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$TAGS_JSON") \
+            $(printf '${{ env.REGISTRY_HOSTNAME }}/${{ env.IMAGE_NAME }}@sha256:%s ' *)
